@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "664639827754",
+    "project_id": "matcha-f4a1a",
+    "storage_bucket": "matcha-f4a1a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:664639827754:android:cfa28f2896ab915702f853",
+        "android_client_info": {
+          "package_name": "com.matcha.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0vKFJrpomljP8e7qxr2G2ZdufODXhxuk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
