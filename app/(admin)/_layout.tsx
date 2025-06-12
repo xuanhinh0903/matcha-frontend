@@ -7,6 +7,7 @@ import { getAuthUser, isUserAdmin } from '@/store/global/auth/auth.slice';
 export default function AdminLayout() {
   const user = useAppSelector(getAuthUser);
   const isAdmin = useAppSelector(isUserAdmin);
+  
   const router = useRouter();
 
   useEffect(() => {
