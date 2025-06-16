@@ -91,7 +91,6 @@ export const Discover = React.memo(
       try {
         if (isLiking || userId === '') return;
         const response = await likeUser(userId).unwrap();
-        console.log('🚀 ~ handleLikeUser ~ response:', response);
 
         // Check for match using both isMatch flag and status
         const isActualMatch =

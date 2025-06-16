@@ -16,6 +16,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { computeDistance } from '../../utils';
 import { useGetProfileQuery } from '@/rtk-query';
 import { useLocation } from '@/contexts/LocationContext';
+import { useLocalSearchParams } from 'expo-router';
+import { useDiscoverProfile } from '@/features/discover-profile/hooks/useDiscoverProfile';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -92,6 +94,7 @@ export const SwipeCardChildren = ({
   renderChoice,
   onProfilePress,
 }: ISwipeCardChildren) => {
+  const id = (item.user_id);
   const [city, setCity] = useState<string>('');
   const { userLocation } = useLocation();
   const [distance, setDistance] = useState<number>(0);
@@ -99,82 +102,98 @@ export const SwipeCardChildren = ({
     item.photos.find((photo) => photo.is_profile_picture)?.photo_url ||
     item.photos[0]?.photo_url ||
     'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg';
+    const { data: currentUserProfile } = useGetProfileQuery();
+    const { profile, basicProfile, photos, interests, loading } =
+    useDiscoverProfile(id.toString());
 
-  // Get city name from user location when component mounts
-  useEffect(() => {
-    if (!userLocation) return;
-    const getCityName = async () => {
-      if (item.location?.coordinates) {
-        try {
-          // Ensure coordinates are in the expected format
-          let latitude, longitude;
-
-          if (
-            Array.isArray(item.location.coordinates) &&
-            item.location.coordinates.length >= 2
-          ) {
-            // GeoJSON format is [longitude, latitude]
-            [longitude, latitude] = item.location.coordinates;
-          } else if (typeof item.location.coordinates === 'object') {
-            // For the case when it's passed as an object like {latitude, longitude}
-            // Use type assertion to handle the non-array object case
-            const coords = item.location.coordinates as unknown as {
-              latitude?: number;
-              longitude?: number;
-              lat?: number;
-              lng?: number;
-            };
-
-            latitude = coords.latitude || coords.lat;
-            longitude = coords.longitude || coords.lng;
-          }
-
-          // Make sure we have valid coordinates before proceeding
-          if (typeof latitude !== 'number' || typeof longitude !== 'number') {
-            console.log(
-              'Invalid coordinates format:',
-              item.location.coordinates
-            );
-            return;
-          }
-
-          console.log('SwipeCardChildren', { latitude, longitude });
-
-          // Use the global userLocation instead of fetching from profile
-          if (userLocation) {
-            const [userLng, userLat] = userLocation;
-            setDistance(
-              computeDistance([userLng, userLat], [longitude, latitude])
-            );
-          }
-
-          const result = await Location.reverseGeocodeAsync({
-            latitude,
-            longitude,
-          });
-
-          console.log('result', result);
-          if (result && result.length > 0) {
-            const location = result[0];
-            const cityName =
-              location.city ||
-              location.district ||
-              location.subregion ||
-              location.region;
-            if (cityName) {
-              setCity(
-                location.country ? `${cityName}, ${location.country}` : cityName
-              );
+    useEffect(() => {
+      const getCityName = async () => {
+        if (basicProfile?.location?.coordinates) {
+          try {
+            let latitude, longitude;
+  
+            if (
+              Array.isArray(basicProfile.location.coordinates) &&
+              basicProfile.location.coordinates.length >= 2
+            ) {
+              [longitude, latitude] = basicProfile.location.coordinates;
+            } else if (typeof basicProfile.location.coordinates === 'object') {
+              const coords = basicProfile.location.coordinates as unknown as {
+                latitude?: number;
+                longitude?: number;
+                lat?: number;
+                lng?: number;
+              };
+  
+              latitude = coords.latitude || coords.lat;
+              longitude = coords.longitude || coords.lng;
             }
+  
+            if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+              console.log(
+                'Invalid coordinates format:',
+                basicProfile.location.coordinates
+              );
+              return;
+            }
+  
+            const currentUserLocation = currentUserProfile?.location?.coordinates;
+  
+            if (currentUserLocation) {
+              let userLat, userLng;
+  
+              if (
+                Array.isArray(currentUserLocation) &&
+                currentUserLocation.length >= 2
+              ) {
+                [userLng, userLat] = currentUserLocation;
+              } else if (typeof currentUserLocation === 'object') {
+                const userCoords = currentUserLocation as unknown as {
+                  latitude?: number;
+                  longitude?: number;
+                  lat?: number;
+                  lng?: number;
+                };
+  
+                userLat = userCoords.latitude || userCoords.lat;
+                userLng = userCoords.longitude || userCoords.lng;
+              }
+  
+              if (typeof userLat === 'number' && typeof userLng === 'number') {
+                setDistance(
+                  computeDistance([userLng, userLat], [longitude, latitude])
+                );
+              }
+            }
+  
+            const result = await Location.reverseGeocodeAsync({
+              latitude,
+              longitude,
+            });
+  
+            if (result && result.length > 0) {
+              const location = result[0];
+              const cityName =
+                location.city ||
+                location.district ||
+                location.subregion ||
+                location.region;
+              if (cityName) {
+                setCity(
+                  location.country ? `${cityName}, ${location.country}` : cityName
+                );
+              }
+            }
+          } catch (error) {
+            console.error('Error getting city:', error);
           }
-        } catch (error) {
-          console.error('Error getting city:', error);
         }
+      };
+  
+      if (basicProfile) {
+        getCityName();
       }
-    };
-
-    getCityName();
-  }, [item.location, userLocation]);
+    }, [basicProfile]);
 
   const handlePress = () => {
     onProfilePress(item.user_id.toString());

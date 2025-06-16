@@ -5,6 +5,7 @@ export interface ProfileFormData {
   birthdate?: string; // ISO date string
   gender?: 'male' | 'female' | 'other' | null;
   interests?: number[]; // array of interest IDs
+  location?: string; // Thêm trường location để lưu vị trí dạng text
 }
 
 export interface Photo {

@@ -21,6 +21,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import { styles } from './styles';
 import InterestSelector from '@/features/shared/components/InterestSelector';
+import { useLocation } from '@/contexts/LocationContext';
+import { getCityFromCoordinates } from '@/utils/location.utils';
 
 // Define interface for the user interests response
 interface UserInterestsResponse {
@@ -58,6 +60,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
     skip: !visible, // Only fetch when modal is visible
   });
   const [setUserInterests] = useSetUserInterestsMutation();
+  const { userLocation, locationLoading, locationError, refreshLocation } = useLocation();
 
   // Update form data when initial data changes or when modal becomes visible
   useEffect(() => {
@@ -178,6 +181,23 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
   const isSaveDisabled = isUpdating || isUpdatingInterests;
 
+  // Hàm xử lý cập nhật vị trí hiện tại
+  const handleUpdateCurrentLocation = async () => {
+    try {
+      await refreshLocation(); // Yêu cầu cập nhật vị trí
+      if (userLocation) {
+        // Có thể dùng getCityFromCoordinates để lấy tên thành phố, hoặc lưu chuỗi toạ độ
+        // const city = await getCityFromCoordinates(userLocation);
+        // handleChange('location', city);
+        handleChange('location', `${userLocation[1]}, ${userLocation[0]}`); // latitude, longitude
+      } else {
+        showErrorToast('Không thể lấy vị trí hiện tại');
+      }
+    } catch (error) {
+      showErrorToast('Lỗi khi lấy vị trí');
+    }
+  };
+
   return (
     <Modal
       visible={visible}
@@ -246,6 +266,33 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
               onChangeText={(text) => handleChange('bio', text)}
               multiline
             />
+
+            {/* Trường nhập vị trí và nút cập nhật vị trí hiện tại */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Location</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <TextInput
+                  style={[styles.input, { flex: 1 }]}
+                  placeholder="Enter your location or use current location"
+                  value={formData.location || ''}
+                  onChangeText={(text) => handleChange('location', text)}
+                  editable={!isUpdatingInterests}
+                />
+                <TouchableOpacity
+                  style={{ marginLeft: 8, padding: 8, backgroundColor: '#eee', borderRadius: 6 }}
+                  onPress={handleUpdateCurrentLocation}
+                  disabled={locationLoading || isUpdatingInterests}
+                >
+                  <Text style={{ fontSize: 12 }}>
+                    {locationLoading ? '...' : '📍'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              {/* Hiển thị lỗi nếu có */}
+              {locationError ? (
+                <Text style={{ color: 'red', fontSize: 12 }}>{locationError}</Text>
+              ) : null}
+            </View>
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Interests</Text>

@@ -31,20 +31,20 @@ export const getCityFromCoordinates = async (
   }
 
   try {
-    // Expo Location expects [latitude, longitude] order for reverse geocoding
+    // Lưu ý: [longitude, latitude] => phải truyền { latitude, longitude }
     const [longitude, latitude] = coordinates;
 
-    // Get location details from coordinates
+    // Đúng thứ tự: latitude trước, longitude sau
     const geoCodeResults = await Location.reverseGeocodeAsync({
-      latitude,
-      longitude,
+      latitude: latitude,
+      longitude: longitude,
     });
 
-    // Extract city information
+    // Log để debug nếu cần
+    // console.log('geoCodeResults', geoCodeResults);
+
     if (geoCodeResults && geoCodeResults.length > 0) {
       const location = geoCodeResults[0];
-
-      // Try different fields to get the most specific location name
       const city =
         location.city ||
         location.district ||
