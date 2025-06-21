@@ -14,7 +14,7 @@
         "EXPO_NO_DOTENV": "0",
         "APP_ENV": "production",
         "FLIPPER_DISABLE": "1",
-        "EXPO_PUBLIC_API_URL": "http://ec2-18-141-209-223.ap-southeast-1.compute.amazonaws.com:3030/",
+        "EXPO_PUBLIC_API_URL": "https://matcha-app.xyz/",
         "EXPO_PUBLIC_APP_ENV": "production",
         "EXPO_PUBLIC_PROJECT_ID": "6c9d5c2a-f900-496a-8d34-4cb1b3ec8b2d"
       }
@@ -30,7 +30,7 @@
         "EXPO_NO_DOTENV": "0",
         "APP_ENV": "production",
         "FLIPPER_DISABLE": "1",
-        "EXPO_PUBLIC_API_URL": "http://ec2-18-141-209-223.ap-southeast-1.compute.amazonaws.com:3030/",
+        "EXPO_PUBLIC_API_URL": "https://matcha-app.xyz/",
         "EXPO_PUBLIC_APP_ENV": "production",
         "EXPO_PUBLIC_PROJECT_ID": "6c9d5c2a-f900-496a-8d34-4cb1b3ec8b2d"
       },

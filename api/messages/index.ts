@@ -233,7 +233,7 @@ export const useMessageSocket = (token: string) => {
         socketRef.current = null;
       }
 
-      setSocketStatus('connecting');
+    setSocketStatus('connecting');
       console.log('Initializing WebSocket connection...');
 
       const newSocket = io(`${process.env.EXPO_PUBLIC_API_URL}messages`, {

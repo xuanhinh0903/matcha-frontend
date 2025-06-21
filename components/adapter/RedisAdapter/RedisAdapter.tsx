@@ -88,6 +88,7 @@ const RedisAdapter = () => {
         });
 
         newSocket.on('connect_error', (error) => {
+          console.log("🚀 ~ newSocket.on ~ error:", error)
           console.error('⚠️ Redis adapter socket error:', error.message);
           // Retry connection with exponential backoff
           setTimeout(() => {
